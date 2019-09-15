@@ -1,0 +1,28 @@
+# Backup files #
+################
+*~
+*.bak
+
+# Directory files #
+###################
+*directory
+
+# Compiled source #
+###################
+*.a
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.py[ocd]
+*.so
+
+#Cache and IDE
+__pycache__
+.ipynb_checkpoints
+.vscode
+
+#Other
+*.tex
+*.toc
