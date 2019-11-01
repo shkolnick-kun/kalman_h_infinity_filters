@@ -128,17 +128,18 @@ class ExtendedKalmanHinfFilterPosterior(ExtendedKalmanFilter):
             C = dot(H_hat, PHT)
             
             D = PHT.dot(linalg.pinv(C))
-            self.P += D.dot(A.dot(D.T))
-            
-            #Need to recompute self.K and self.x
-            self.K = dot(dot(self.P, H.T), linalg.inv(R))
-            x = self.x + dot(self.K, self.y)
-            
-            #Recompute self.S and self.SI for debug purposes
-            PHT = self.P.dot(H.T)
-            self.S = H.dot(PHT) + R
-            self.SI = linalg.inv(self.S)
-            
+            newP   = self.P + D.dot(A.dot(D.T))
+            #Check H-infinity correction quality
+            if np.all(np.linalg.eigvals(newP) > 0):
+                self.P = newP
+                #Recompute self.S and self.SI for debug purposes
+                PHT = self.P.dot(H.T)
+                self.S = H.dot(PHT) + R
+                self.SI = linalg.inv(self.S)
+                #Need to recompute self.K and self.x
+                self.K = dot(dot(self.P, H.T), linalg.inv(R))
+                x = self.x + dot(self.K, self.y)
+        
         self.x = x
         
         # set to None to force recompute

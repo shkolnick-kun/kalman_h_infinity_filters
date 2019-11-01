@@ -106,11 +106,17 @@ class ExtendedKalmanHinfFilterPrior(ExtendedKalmanFilter):
             #Divergence detected, H-infinity correction needed
             A = np.outer(nu, nu.T)/thr - self.S
             D = PHT.dot(linalg.pinv(C))
-            self.P += D.dot(A.dot(D.T))
+            
+            newP = self.P + D.dot(A.dot(D.T))
             #Need to recompute PHT, self.S and self.SI due to self.P update
-            PHT = dot(self.P, H.T)
-            self.S = dot(H, PHT) + R
-            self.SI = linalg.inv(self.S)
+            newPHT = dot(newP, H.T)
+            newS = dot(H, newPHT) + R
+            #Check H-infinity correction quality
+            if np.all(np.linalg.eigvals(newS) > 0):
+                self.P = newP
+                PHT    = newPHT
+                self.S = newS
+                self.SI = linalg.inv(self.S)
         
         #Now we may update self.K, self.P, self.y, self.x
         self.y = nu
