@@ -24,9 +24,10 @@ import scipy.linalg as linalg
 from filterpy.kalman import ExtendedKalmanFilter
 
 class ExtendedKalmanHinfFilterPosterior(ExtendedKalmanFilter):
-    def __init__(self, dim_x, dim_z, dim_u=0, alpha = 0.01):
+    def __init__(self, dim_x, dim_z, dim_u=0, alpha = 0.01, eps_mul=1.0):
         ExtendedKalmanFilter.__init__(self, dim_x, dim_z, dim_u)
         self.beta_n = chi2.ppf(1.0 - alpha, dim_z)
+        self._eps_mul = eps_mul
         
     def update(self, z, HJacobian, Hx, R=None, args=(), hx_args=(),
                residual=np.subtract):
@@ -129,17 +130,20 @@ class ExtendedKalmanHinfFilterPosterior(ExtendedKalmanFilter):
             
             D = PHT.dot(linalg.pinv(C))
             newP   = self.P + D.dot(A.dot(D.T))
+            PHT = newP.dot(H.T)
+            newS = H.dot(PHT) + R
             #Check H-infinity correction quality
-            if np.all(np.linalg.eigvals(newP) > 0):
+            ev = np.linalg.eigvals(newS)
+            eps = np.finfo(ev.dtype).eps * self._eps_mul
+            if np.all(ev > eps * np.max(ev)):
                 self.P = newP
                 #Recompute self.S and self.SI for debug purposes
-                PHT = self.P.dot(H.T)
-                self.S = H.dot(PHT) + R
+                self.S = newS
                 self.SI = linalg.inv(self.S)
                 #Need to recompute self.K and self.x
                 self.K = dot(dot(self.P, H.T), linalg.inv(R))
                 x = self.x + dot(self.K, self.y)
-        
+
         self.x = x
         
         # set to None to force recompute

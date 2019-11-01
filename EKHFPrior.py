@@ -24,9 +24,10 @@ import scipy.linalg as linalg
 from filterpy.kalman import ExtendedKalmanFilter
 
 class ExtendedKalmanHinfFilterPrior(ExtendedKalmanFilter):
-    def __init__(self, dim_x, dim_z, dim_u=0, alpha = 0.01):
+    def __init__(self, dim_x, dim_z, dim_u=0, alpha=0.01, eps_mul=0.1):
         ExtendedKalmanFilter.__init__(self, dim_x, dim_z, dim_u)
         self.beta_n = chi2.ppf(1.0 - alpha, dim_z)
+        self._eps_mul = eps_mul
         
     def update(self, z, HJacobian, Hx, R=None, args=(), hx_args=(),
                residual=np.subtract):
@@ -106,23 +107,25 @@ class ExtendedKalmanHinfFilterPrior(ExtendedKalmanFilter):
             #Divergence detected, H-infinity correction needed
             A = np.outer(nu, nu.T)/thr - self.S
             D = PHT.dot(linalg.pinv(C))
-            
+
             newP = self.P + D.dot(A.dot(D.T))
             #Need to recompute PHT, self.S and self.SI due to self.P update
             newPHT = dot(newP, H.T)
             newS = dot(H, newPHT) + R
             #Check H-infinity correction quality
-            if np.all(np.linalg.eigvals(newS) > 0):
+            ev = np.linalg.eigvals(newS)
+            eps = np.finfo(ev.dtype).eps * self._eps_mul
+            if np.all(ev > eps * np.max(ev)):
                 self.P = newP
                 PHT    = newPHT
                 self.S = newS
                 self.SI = linalg.inv(self.S)
-        
+
         #Now we may update self.K, self.P, self.y, self.x
         self.y = nu
         self.K = PHT.dot(self.SI)
         self.x += dot(self.K, nu)
-        
+
         # P = (I-KH)P(I-KH)' + KRK' is more numerically stable
         # and works for non-optimal K vs the equation
         # P = (I-KH)P usually seen in the literature.
