@@ -146,7 +146,7 @@ class UDExtendedKalmanHinfFilterPrior(UDExtendedKalmanFilter):
         s = c + r
         
         a = (nu * nu) / self.beta_1 - s
-        if a >= 0.0:
+        if a > 0.0:
             #Divergence detected, H-infinity correction needed
             q = a / (c * c)
             WW = np.concatenate((u, dot(u, v).reshape((n,1))), axis = 1)

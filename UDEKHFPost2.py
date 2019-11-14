@@ -163,7 +163,7 @@ class UDExtendedKalmanHinfFilterPosterior2(UDExtendedKalmanFilter):
         s = c + r
         
         a = (eta * eta) / self.beta_1 - s
-        if a >= 0.0:
+        if a > 0.0:
             #Divergence detected, H-infinity correction needed
             k = a / c + 1.0
             d *= k

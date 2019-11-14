@@ -103,7 +103,7 @@ class ExtendedKalmanHinfFilterPrior2(ExtendedKalmanFilter):
         self.SI = linalg.inv(self.S)
         
         thr = self.beta_n
-        if dot(nu.T, dot(self.SI, nu)) >= thr: 
+        if dot(nu.T, dot(self.SI, nu)) > thr: 
             #Divergence detected, H-infinity correction needed
             nutnu = dot(nu.T, nu)
             k  = nutnu * nutnu / thr - dot(nu.T, dot(self.S, nu))

@@ -162,7 +162,7 @@ class UDExtendedKalmanHinfFilterPosterior(UDExtendedKalmanFilter):
         s = f.dot(v) + r
         
         a = (eta * eta) / self.beta_1 - s
-        if a >= 0.0:
+        if a > 0.0:
             #Divergence detected, H-infinity correction needed
             h_tilde = h_hat - h_hat.dot(K)*h
             f_tilde = h_tilde.dot(u)

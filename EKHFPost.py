@@ -120,7 +120,7 @@ class ExtendedKalmanHinfFilterPosterior(ExtendedKalmanFilter):
         SI = linalg.inv(S)
         
         thr = self.beta_n
-        if dot(eta.T, dot(SI, eta)) >= thr: 
+        if dot(eta.T, dot(SI, eta)) > thr: 
             #Divergence detected, H-infinity correction needed
             A = outer(eta, eta.T)/thr - S
             
