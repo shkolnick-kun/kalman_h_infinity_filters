@@ -345,7 +345,7 @@ def IntSlider(value, **kwargs):
     return ipywidgets.IntSlider(value, continuous_update=False, **kwargs)
 
 
-def plot_measurements(xs, ys=None, dt=None, color='k', lw=1, label='Measurements',
+def plot_measurements(xs, ys=None, dt=None, color='k', fc='None', lw=2, label='Measurements',
                       lines=False, **kwargs):
     """ Helper function to give a consistant way to display
     measurements in the book.
@@ -362,11 +362,11 @@ def plot_measurements(xs, ys=None, dt=None, color='k', lw=1, label='Measurements
             return plt.plot(xs, color=color, lw=lw, ls='--', label=label, **kwargs)
     else:
         if ys is not None:
-            return plt.scatter(xs, ys, edgecolor=color, facecolor='none',
-                        lw=2, label=label, **kwargs),
+            return plt.scatter(xs, ys, edgecolor=color, 
+                               facecolor=fc, lw=lw, label=label, **kwargs)
         else:
-            return plt.scatter(range(len(xs)), xs, edgecolor=color, facecolor='none',
-                        lw=2, label=label, **kwargs),
+            return plt.scatter(range(len(xs)), xs, edgecolor=color, 
+                               facecolor=fc, lw=lw, label=label, **kwargs)
 
 
 def plot_residual_limits(Ps, stds=1.):

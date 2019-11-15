@@ -24,7 +24,7 @@ import scipy.linalg as linalg
 from filterpy.kalman import ExtendedKalmanFilter
 
 class ExtendedKalmanHinfFilterPrior2(ExtendedKalmanFilter):
-    def __init__(self, dim_x, dim_z, dim_u=0, alpha=0.01, eps_mul=0.1):
+    def __init__(self, dim_x, dim_z, dim_u=0, alpha=0.01):
         ExtendedKalmanFilter.__init__(self, dim_x, dim_z, dim_u)
         self.beta_n = chi2.ppf(1.0 - alpha, dim_z)
         self._eps_mul = eps_mul
