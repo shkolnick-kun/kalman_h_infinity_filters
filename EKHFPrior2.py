@@ -27,7 +27,6 @@ class ExtendedKalmanHinfFilterPrior2(ExtendedKalmanFilter):
     def __init__(self, dim_x, dim_z, dim_u=0, alpha=0.01):
         ExtendedKalmanFilter.__init__(self, dim_x, dim_z, dim_u)
         self.beta_n = chi2.ppf(1.0 - alpha, dim_z)
-        self._eps_mul = eps_mul
         
     def update(self, z, HJacobian, Hx, R=None, args=(), hx_args=(),
                residual=np.subtract):
